@@ -1,10 +1,10 @@
 {
-  "name": "contact-manager-express-mongo-api",
+  "name": "enishi",
   "version": "0.0.2",
   "engines": {
     "node": "20.11.1"
   },
-  "description": "Express project",
+  "description": "Contact manager REST API built with Express, MongoDB and TypeScript",
   "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
