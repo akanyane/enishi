@@ -13,6 +13,7 @@ router.route("/")
 router.route("/:id")
   .get(getContact)
   .put(updateContact)
+  .patch(updateContact)
   .delete(deleteContact);
 
 export default router;
