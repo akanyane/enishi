@@ -1,5 +1,5 @@
 /* Enishi — layout classes extracted from the Fichário design's inline styles.
-   Tokens, components and motion live in fichario.css (kept as handed off). */
+   Tokens, components and motion live in theme.css (kept as handed off). */
 
 html, body, #root { height: 100%; margin: 0; }
 body { background: #F3F5F2; font-family: "Schibsted Grotesk", system-ui, sans-serif; }

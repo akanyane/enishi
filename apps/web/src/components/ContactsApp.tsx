@@ -300,10 +300,10 @@ export default function ContactsApp() {
       <header className="fx-header glass app-header">
         <Brand />
         <div className="fx-search" style={{ flex: "1 1 480px", maxWidth: 580, marginLeft: 16 }}>
-          <label htmlFor="busca" className="sr">{t.search_label}</label>
+          <label htmlFor="search" className="sr">{t.search_label}</label>
           <div className="field search-field">
             <Search className="ico" />
-            <input id="busca" type="search" autoComplete="off" placeholder={t.search_ph} value={q}
+            <input id="search" type="search" autoComplete="off" placeholder={t.search_ph} value={q}
               onChange={(e) => { setQ(e.target.value); setShown(PAGE); setActiveLetter(null); if (pane !== "edit") setPane("list"); }} />
             {q && (
               <button type="button" className="btn btn-light btn-icon btn-sm pill" style={{ animation: "fx-chip .3s var(--spring)" }}
@@ -335,8 +335,8 @@ export default function ContactsApp() {
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <p className="tnum list-count" aria-live="polite">{countLabel}</p>
               <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-                <label htmlFor="ordem" className="sr">{t.sort_label}</label>
-                <select id="ordem" className="select" value={sort}
+                <label htmlFor="sort" className="sr">{t.sort_label}</label>
+                <select id="sort" className="select" value={sort}
                   onChange={(e) => { setSort(e.target.value as SortKey); resetListView(); if (scrollRef.current) scrollRef.current.scrollTop = 0; }}>
                   <option value="first">{t.sort_first}</option>
                   <option value="last">{t.sort_last}</option>

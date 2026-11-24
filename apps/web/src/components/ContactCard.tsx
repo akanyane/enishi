@@ -34,13 +34,13 @@ export default function ContactCard({ contact: c, sortKey, flip, favPop, onBack,
         <ChevronLeft />{t.back}
       </button>
       <div className={`stack ${flip % 2 ? "flip-b" : "flip-a"}`}>
-        <article className="card" aria-labelledby="d-nome">
+        <article className="card" aria-labelledby="d-name">
           <span className="card-tab" aria-hidden="true">{letter}</span>
 
           <div className="detail-head">
             <span className={`av av-ring av-${avatarTone(full)}`} style={{ width: 80, height: 80, fontSize: 28 }} aria-hidden="true">{initials(c)}</span>
             <div className="rv" style={{ ...d(0), flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-              <h2 id="d-nome" className="detail-name">{full}</h2>
+              <h2 id="d-name" className="detail-name">{full}</h2>
               <p style={{ margin: 0, fontSize: 15, lineHeight: "22px", color: "var(--muted)" }}>{sub}</p>
             </div>
             <div className="detail-actions rv" style={{ ...d(1), display: "flex", gap: 8, alignSelf: "flex-start" }}>
