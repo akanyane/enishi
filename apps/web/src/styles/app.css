@@ -1,0 +1,134 @@
+/* Enishi — layout classes extracted from the Fichário design's inline styles.
+   Tokens, components and motion live in theme.css (kept as handed off). */
+
+html, body, #root { height: 100%; margin: 0; }
+body { background: #F3F5F2; font-family: "Schibsted Grotesk", system-ui, sans-serif; }
+.fx-wrap { min-height: 560px; }
+
+.fx .ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fx .btn[disabled] { opacity: .7; cursor: progress; transform: none; }
+
+/* Buttons and chips lift 1px on hover. Without a taller hit area, a cursor resting on the
+   bottom edge un-hovers the lifted element, it drops back, re-hovers, and jitters forever. */
+.fx .btn::before, .fx button.chip::before { content: ""; position: absolute; inset: -1px 0 -3px; }
+.fx button.chip { position: relative; }
+
+/* spinner for busy buttons */
+.fx .spinner {
+  width: 16px; height: 16px; border-radius: 999px; flex: none;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: fx-spin .7s linear infinite;
+}
+@keyframes fx-spin { to { transform: rotate(360deg); } }
+
+/* header */
+.fx .app-header, .fx .auth-header {
+  position: relative; z-index: 10; height: 72px; flex: none;
+  display: flex; align-items: center; gap: 16px; padding: 0 24px;
+  border-bottom: 1px solid var(--divider);
+}
+.fx .auth-header { gap: 8px; }
+
+/* list column */
+.fx .fx-list {
+  width: 448px; flex: none; display: flex; flex-direction: column; min-height: 0;
+  border-right: 1px solid var(--divider); background: var(--background);
+}
+.fx .list-tools { flex: none; padding: 16px 16px 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+.fx .list-count { margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -0.01em; flex: 1; min-width: 120px; }
+.fx .tag-row { display: flex; gap: 6px; margin: -4px -16px -4px 0; padding: 4px 16px 4px 0; }
+
+/* list states (error, empty, no results) */
+.fx .list-state { padding: 48px 28px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.fx .state-icon {
+  width: 52px; height: 52px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--content2); color: var(--muted);
+}
+.fx .state-icon.danger { background: var(--danger-soft); color: var(--danger); }
+.fx .state-title { margin: 0; font-size: 21px; line-height: 28px; font-weight: 750; letter-spacing: -0.01em; }
+.fx .state-body { margin: 0; font-size: 15px; line-height: 22px; color: var(--muted); max-width: 340px; }
+
+.fx .empty-art { position: relative; width: 176px; height: 112px; margin: 18px 0 6px; }
+.fx .empty-back {
+  position: absolute; left: 18px; right: -10px; top: 10px; bottom: -10px;
+  border: 1.5px solid var(--divider); border-radius: 12px; background: var(--content2); transform: rotate(4deg);
+}
+.fx .empty-tab {
+  position: absolute; left: 14px; top: -15px; width: 46px; height: 17px;
+  border: 1.5px solid var(--divider-strong); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--content1);
+}
+.fx .empty-front {
+  position: absolute; inset: 0; border: 1.5px solid var(--divider-strong); border-radius: 12px;
+  background-color: var(--content1); background-position: 0 12px;
+}
+.fx .empty-plus {
+  position: absolute; right: -14px; bottom: -14px; width: 40px; height: 40px; border-radius: 999px;
+  background: var(--primary); color: var(--primary-fg); display: flex; align-items: center; justify-content: center;
+}
+
+/* detail column */
+.fx .fx-detail-inner { width: 100%; max-width: 860px; margin: 0 auto; padding: 56px 48px 72px; }
+.fx .pick-empty {
+  height: 100%; min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; text-align: center; color: var(--muted);
+}
+.fx .pick-art { width: 220px; height: 132px; border: 1.5px dashed var(--faint); border-radius: 14px; background-color: var(--content1); }
+
+.fx .detail-head { display: flex; align-items: center; gap: 22px; padding: 30px 28px 20px; }
+.fx .detail-name { margin: 0; font-size: 32px; line-height: 38px; font-weight: 780; letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.fx .notes-head {
+  margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.fx .card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 16px 28px 22px; margin-top: 12px; border-top: 1px solid var(--divider);
+}
+
+/* form */
+.fx .form-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 780; letter-spacing: -0.02em; }
+.fx .form-grid { padding: 20px 28px 8px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.fx .form-foot {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 16px 28px 22px; margin-top: 12px; border-top: 1px solid var(--divider);
+}
+.fx .form-alert {
+  margin: 16px 28px 0; padding: 12px 14px; border-radius: 12px; background: var(--danger-soft); color: var(--danger);
+  font-size: 14px; font-weight: 600; display: flex; gap: 10px; align-items: center;
+}
+
+/* modal & toast */
+.fx .modal-icon {
+  width: 48px; height: 48px; border-radius: 14px; background: var(--danger-soft); color: var(--danger);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.fx .modal-title { margin: 18px 0 8px; font-size: 21px; line-height: 28px; font-weight: 750; letter-spacing: -0.01em; }
+.fx .toast .toast-err { color: #FF9AA0; animation: fx-check .5s var(--spring) .15s both; }
+.fx.dark .toast .toast-err { color: #C8323C; }
+
+/* auth */
+/* scrollbar-gutter avoids a show/hide scrollbar loop when the form is exactly viewport-tall */
+.fx .auth-main { flex: 1; min-height: 0; display: flex; scrollbar-gutter: stable; }
+.fx .auth-col {
+  width: 100%; max-width: 460px; margin: auto; padding: 48px 20px 64px;
+  display: flex; flex-direction: column; gap: 44px;
+}
+.fx .auth-tagline { margin: 0; font-size: 15px; color: var(--muted); text-align: center; }
+.fx .auth-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 780; letter-spacing: -0.02em; }
+.fx .card-tab[lang="ja"] { font-weight: 600; font-size: 16px; }
+.fx .link-btn {
+  border: 0; background: none; padding: 0; font-size: 14px; font-weight: 700;
+  color: var(--primary-ink); text-decoration: underline; text-decoration-color: var(--divider); text-underline-offset: 3px;
+}
+.fx .link-btn:hover { text-decoration-color: var(--primary); }
+.fx .auth-quote { margin: 0; text-align: center; color: var(--muted); }
+.fx .auth-quote blockquote { margin: 0 0 6px; font-size: 18px; letter-spacing: .08em; color: var(--foreground); }
+.fx .auth-quote figcaption { font-size: 13px; line-height: 20px; font-style: italic; }
+
+@container fx (max-width: 820px) {
+  /* the extra sign-out button needs tighter gaps to keep the top row on one line at 390px */
+  .fx .app-header { column-gap: 6px; }
+  .fx .app-header .brand { margin-right: auto; }
+  .fx .auth-header { padding: 12px 16px; height: 64px; }
+  .fx .auth-col { padding: 32px 14px 48px; gap: 36px; }
+}

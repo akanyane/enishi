@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { constants } from "../constants";
+import { HttpError } from "../errors";
 
 const titles: Record<number, string> = {
   [constants.VALIDATION_ERROR]: "Validation Failed",
-  [constants.NOT_FOUND]: "Not Found",
   [constants.UNAUTHORIZED]: "Unauthorized",
   [constants.FORBIDDEN]: "Forbidden",
+  [constants.NOT_FOUND]: "Not Found",
+  [constants.CONFLICT]: "Conflict",
   [constants.SERVER_ERROR]: "Server Error",
 };
 
@@ -15,11 +17,14 @@ const errorHandler = (
   response: Response,
   next: NextFunction
 ) => {
-  const statusCode = response.statusCode >= 400 ? response.statusCode : constants.SERVER_ERROR;
+  const statusCode = error instanceof HttpError
+    ? error.status
+    : response.statusCode >= 400 ? response.statusCode : constants.SERVER_ERROR;
 
   response.status(statusCode).json({
     title: titles[statusCode] ?? "Error",
     message: error.message,
+    ...(error instanceof HttpError ? error.details : {}),
     stackTrace: process.env.NODE_ENV === "production" ? undefined : error.stack,
   });
 };
