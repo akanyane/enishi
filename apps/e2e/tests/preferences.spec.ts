@@ -1,0 +1,31 @@
+import { test, expect } from "./fixtures";
+
+test("remembers theme and language across reloads", async ({ page, seed }) => {
+  await seed();
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Usar tema escuro" }).click();
+  await page.getByRole("button", { name: /^Idioma/ }).click();
+  await page.getByRole("menuitemradio", { name: /English/ }).click();
+
+  await expect(page.locator(".fx.dark")).toBeVisible();
+  await expect(page.getByRole("button", { name: "New contact" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator(".fx.dark")).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByText("7 contacts")).toBeVisible();
+});
+
+test("translates an open toast when the language changes", async ({ page, seed }) => {
+  await seed();
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bruno Okada/ }).click();
+  await page.getByRole("button", { name: "Excluir contato" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Excluir contato" }).click();
+  await expect(page.getByText("Contato excluído")).toBeVisible();
+
+  await page.getByRole("button", { name: /^Idioma/ }).click();
+  await page.getByRole("menuitemradio", { name: /Español/ }).click();
+  await expect(page.getByText("Contacto eliminado")).toBeVisible();
+});

@@ -1,0 +1,17 @@
+{
+  "name": "@enishi/e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@enishi/shared": "workspace:*",
+    "@playwright/test": "~1.65.1",
+    "@types/node": "^26.6.6",
+    "mongodb-memory-server": "^11.4.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
