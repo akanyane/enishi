@@ -29,3 +29,21 @@ test("translates an open toast when the language changes", async ({ page, seed }
   await page.getByRole("menuitemradio", { name: /Español/ }).click();
   await expect(page.getByText("Contacto eliminado")).toBeVisible();
 });
+
+test("keeps what was typed in the form when switching language", async ({ page, seed }) => {
+  await seed();
+  await page.goto("/");
+  await page.getByRole("button", { name: "Novo contato" }).first().click();
+  await page.locator("#f-firstName").fill("Helena");
+  await page.getByLabel("E-mail").fill("errado@");
+  await page.getByLabel("E-mail").blur();
+  await expect(page.getByText("Esse e-mail não parece válido")).toBeVisible();
+
+  await page.getByRole("button", { name: /^Idioma/ }).click();
+  await page.getByRole("menuitemradio", { name: /English/ }).click();
+
+  await expect(page.getByRole("heading", { name: "New contact" })).toBeVisible();
+  await expect(page.locator("#f-firstName")).toHaveValue("Helena");
+  // The error stays, now translated.
+  await expect(page.getByText("This email doesn't look valid")).toBeVisible();
+});

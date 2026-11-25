@@ -1,8 +1,8 @@
-/**
- * Types shared between the API and the web app.
- * Type-only on purpose: both apps import them with `import type`,
- * so this package never needs a build step.
- */
+/** Types and validation schemas shared by the API and the web app. */
+
+import type { ContactInput } from "./schemas.js";
+
+export * from "./schemas.js";
 
 export interface User {
   id: string;
@@ -10,23 +10,11 @@ export interface User {
   email: string;
 }
 
-export interface Contact {
+export interface Contact extends ContactInput {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  company: string;
-  jobTitle: string;
-  tags: string[];
-  favorite: boolean;
-  notes: string;
   createdAt: string;
   updatedAt: string;
 }
-
-/** Fields the client may send when creating or updating a contact. */
-export type ContactInput = Omit<Contact, "id" | "createdAt" | "updatedAt">;
 
 export interface ApiError {
   title: string;

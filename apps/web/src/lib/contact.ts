@@ -1,5 +1,7 @@
 import type { Contact, ContactInput } from "@enishi/shared";
 
+export { cleanTag } from "@enishi/shared";
+
 export type SortKey = "first" | "last" | "newest" | "updated";
 
 /** Lowercase and strip accents, so "João" matches "joao". */
@@ -42,25 +44,20 @@ export const relativeDate = (iso: string, lang: string) => {
   return rtf.format(-Math.round(d / 365), "year");
 };
 
-export const cleanTag = (t: string) => t.trim().toLowerCase().replace(/\s+/g, "-").replace(/,/g, "");
-
 export const isFamily = (c: Contact) => c.tags.some((t) => ["familia", "family"].includes(norm(t)));
 
 export const titleCase = (s: string) =>
   s.trim().split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
-export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-export const PHONE_RE = /^[0-9+().\-\s]+$/;
+/** Looks like a phone number: used to prefill the right field when creating from a search. */
+export const looksLikePhone = (s: string) => /^[0-9+().\-\s]+$/.test(s);
 
-export type FormState = ContactInput & { tagDraft: string };
-
-export const blankForm = (): FormState => ({
+export const blankContact = (): ContactInput => ({
   firstName: "", lastName: "", email: "", phone: "", company: "", jobTitle: "",
-  notes: "", tags: [], favorite: false, tagDraft: "",
+  notes: "", tags: [], favorite: false,
 });
 
-export const formFrom = (c: Contact): FormState => ({
+export const inputFrom = (c: Contact): ContactInput => ({
   firstName: c.firstName, lastName: c.lastName, email: c.email, phone: c.phone,
-  company: c.company, jobTitle: c.jobTitle, notes: c.notes, tags: [...c.tags],
-  favorite: c.favorite, tagDraft: "",
+  company: c.company, jobTitle: c.jobTitle, notes: c.notes, tags: [...c.tags], favorite: c.favorite,
 });
