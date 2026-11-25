@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Contact, ContactInput } from "@enishi/shared";
 import { api, RequestError } from "../lib/api";
 import {
-  avatarTone, blankForm, daysAgo, formFrom, fullName, indexLetter, initials, isFamily, norm,
-  titleCase, PHONE_RE, type FormState, type SortKey,
+  avatarTone, blankContact, daysAgo, fullName, indexLetter, initials, inputFrom, isFamily, looksLikePhone, norm,
+  titleCase, type SortKey,
 } from "../lib/contact";
 import { useSession } from "../lib/session";
 import { useUI } from "../lib/ui";
@@ -13,7 +13,7 @@ import {
   ArrowDown, ChevronDown, ChevronRight, LogOut, Plus, Refresh, Search, SearchX, Star, UserPlus, WifiOff, X,
 } from "./Icons";
 import ContactCard from "./ContactCard";
-import ContactForm, { validateForm, type FormErrors } from "./ContactForm";
+import ContactForm, { type SaveResult, type ServerFieldErrors } from "./ContactForm";
 import { DeleteModal, Toast, type ToastKey, type ToastState } from "./Overlays";
 
 const PAGE = 20;
@@ -41,12 +41,11 @@ export default function ContactsApp() {
   const [shown, setShown] = useState(PAGE);
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
-  const [form, setForm] = useState<FormState | null>(null);
+  // The form owns its own state (TanStack Form); this only holds what it starts from.
+  const [formInit, setFormInit] = useState<ContactInput | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [touched, setTouched] = useState<Partial<Record<keyof FormErrors, boolean>>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [serverErrors, setServerErrors] = useState<FormErrors>({});
+  // Remounts the form on every open, so it starts clean. Not `flip`: that also changes on a language switch.
+  const [formKey, setFormKey] = useState(0);
 
   const [modalId, setModalId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -181,68 +180,47 @@ export default function ContactsApp() {
 
   const pick = (id: string) => {
     if (id === selectedId && pane !== "edit") { setPane("detail"); return; }
-    setSelectedId(id); setPane("detail"); setForm(null); setEditingId(null); setModalId(null); setFavPop(0); bumpFlip();
+    setSelectedId(id); setPane("detail"); setFormInit(null); setEditingId(null); setModalId(null); setFavPop(0); bumpFlip();
   };
 
-  const startForm = (f: FormState, id: string | null) => {
-    setForm(f); setEditingId(id); setTouched({}); setSubmitted(false); setServerErrors({}); setPane("edit"); bumpFlip();
+  const startForm = (f: ContactInput, id: string | null) => {
+    setFormInit(f); setEditingId(id); setPane("edit"); setFormKey((n) => n + 1); bumpFlip();
   };
-  const newContact = () => startForm(blankForm(), null);
+  const newContact = () => startForm(blankContact(), null);
   const newFromQuery = () => {
-    const f = blankForm();
+    const f = blankContact();
     const v = q.trim();
     if (v.includes("@")) f.email = v;
-    else if (PHONE_RE.test(v)) f.phone = v;
+    else if (looksLikePhone(v)) f.phone = v;
     else f.firstName = titleCase(v);
     startForm(f, null);
   };
-  const editContact = () => { if (selected) startForm(formFrom(selected), selected.id); };
+  const editContact = () => { if (selected) startForm(inputFrom(selected), selected.id); };
 
   const closeForm = () => {
     setPane(selectedId && contacts.some((c) => c.id === selectedId) ? "detail" : "list");
-    setForm(null); setEditingId(null); setTouched({}); setSubmitted(false); setServerErrors({}); bumpFlip();
+    setFormInit(null); setEditingId(null); bumpFlip();
   };
 
-  const save = async () => {
-    if (!form) return;
-    let f = form;
-    if (f.tagDraft.trim()) {
-      const extra = f.tagDraft.trim().toLowerCase().replace(/\s+/g, "-").replace(/,/g, "");
-      f = { ...f, tagDraft: "", tags: f.tags.includes(extra) ? f.tags : [...f.tags, extra] };
-      setForm(f);
-    }
-    const errs = validateForm(f, editingId, contacts, t);
-    setSubmitted(true);
-    setServerErrors({});
-    const first = (["firstName", "email", "phone"] as const).find((k) => errs[k]);
-    if (first) { setTimeout(() => document.getElementById(`f-${first}`)?.focus(), 0); return; }
-
-    const { tagDraft: _draft, ...input } = f;
-    const payload: ContactInput = {
-      ...input,
-      firstName: input.firstName.trim(), lastName: input.lastName.trim(), email: input.email.trim().toLowerCase(),
-      phone: input.phone.trim(), company: input.company.trim(), jobTitle: input.jobTitle.trim(), notes: input.notes.trim(),
-    };
-    setSaving(true);
+  /** Saves already-validated input. Field errors from the API go back to the form to display. */
+  const save = async (input: ContactInput): Promise<SaveResult> => {
     try {
-      const saved = editingId ? await api.updateContact(editingId, payload) : await api.createContact(payload);
+      const saved = editingId ? await api.updateContact(editingId, input) : await api.createContact(input);
       setContacts((list) => (editingId ? list.map((c) => (c.id === saved.id ? saved : c)) : [...list, saved]));
-      setSelectedId(saved.id); setPane("detail"); setForm(null); setEditingId(null); setTouched({}); setSubmitted(false);
+      setSelectedId(saved.id); setPane("detail"); setFormInit(null); setEditingId(null);
       bumpFlip();
       showToast({ msg: "saved", kind: "ok" });
+      return { ok: true };
     } catch (err) {
       if (err instanceof RequestError && (err.status === 409 || err.status === 400) && err.body.fields) {
-        const dupName = err.body.duplicateId ? contacts.find((c) => c.id === err.body.duplicateId) : undefined;
-        setServerErrors({
-          ...(err.body.fields.firstName ? { firstName: t.e_first } : {}),
-          ...(err.body.fields.phone ? { phone: t.e_tel } : {}),
-          ...(err.body.fields.email ? { email: dupName ? t.e_dup(fullName(dupName)) : t.e_email, dupId: err.body.duplicateId } : {}),
-        });
-      } else if (!(err instanceof RequestError && err.status === 401)) {
-        showToast({ msg: "save_failed", kind: "error" });
+        const fields: ServerFieldErrors = {};
+        if (err.body.fields.firstName) fields.firstName = {};
+        if (err.body.fields.phone) fields.phone = {};
+        if (err.body.fields.email) fields.email = { duplicateId: err.body.duplicateId };
+        return { ok: false, fields };
       }
-    } finally {
-      setSaving(false);
+      if (!(err instanceof RequestError && err.status === 401)) showToast({ msg: "save_failed", kind: "error" });
+      return { ok: false };
     }
   };
 
@@ -288,11 +266,10 @@ export default function ContactsApp() {
   const ok = status === "ok";
   const total = contacts.length;
   const filtersOn = !!tag || favOnly;
-  const showForm = pane === "edit" && !!form;
+  const showForm = pane === "edit" && !!formInit;
   const countLabel = status === "loading" ? t.loading : status === "error" ? t.offline
     : sorted.length === total ? t.count(total) : t.count_of(sorted.length, total);
   const modalContact = contacts.find((c) => c.id === modalId) ?? null;
-  const formErrors = form ? { ...validateForm(form, editingId, contacts, t), ...serverErrors } : {};
 
   return (
     <div className={rootClass} lang={lang} data-pane={pane} style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
@@ -463,13 +440,13 @@ export default function ContactsApp() {
         {/* Detail / edit column */}
         <main className="fx-detail scroll desk" style={{ flex: 1, minWidth: 0, display: "flex" }}>
           <div className="fx-detail-inner">
-            {showForm && form && (
+            {showForm && formInit && (
               <ContactForm
-                form={form} setForm={setForm} errors={formErrors} touched={touched} setTouched={setTouched}
-                submitted={submitted} saving={saving} editing={contacts.find((c) => c.id === editingId) ?? null}
-                tagNames={tagNames} flip={flip}
-                onCancel={closeForm} onSave={() => void save()}
-                onOpenDuplicate={(id) => { setSelectedId(id); setPane("detail"); setForm(null); setEditingId(null); setSubmitted(false); setTouched({}); bumpFlip(); }}
+                key={formKey}
+                initial={formInit} editing={contacts.find((c) => c.id === editingId) ?? null}
+                contacts={contacts} tagNames={tagNames} flip={flip}
+                onCancel={closeForm} onSave={save}
+                onOpenDuplicate={(id) => { setSelectedId(id); setPane("detail"); setFormInit(null); setEditingId(null); bumpFlip(); }}
               />
             )}
             {!showForm && ok && selected && (

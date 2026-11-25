@@ -15,8 +15,8 @@ A [Turborepo](https://turborepo.dev) with pnpm workspaces:
 | Package | What it is |
 |---|---|
 | `apps/api` | REST API — Express 5, MongoDB (Mongoose), JWT auth |
-| `apps/web` | Web app — React 19 + Vite, implementing the *Fichário* design |
-| `packages/shared` | TypeScript types shared by both apps (`Contact`, `User`, `ApiError`…) |
+| `apps/web` | Web app — React 19 + Vite + TanStack Form, implementing the *Fichário* design |
+| `packages/shared` | Types and [ArkType](https://arktype.io) validation schemas shared by both apps: the API validates request bodies and the web forms validate input with the same rules |
 | `apps/e2e` | Browser tests (Playwright) that run the real API and web app |
 
 ## Getting started
@@ -46,7 +46,7 @@ The Vite dev server proxies `/api` to the API, so the browser talks to a single 
 | `pnpm dev` | API (tsx watch) and web (Vite) in parallel |
 | `pnpm build` | Builds every app (`apps/*/dist`) |
 | `pnpm typecheck` | Type-checks every package |
-| `pnpm test` | API tests (against an in-memory MongoDB) and web unit tests |
+| `pnpm test` | Schema tests, API tests (against an in-memory MongoDB) and web unit tests |
 | `pnpm test:e2e` | Browser tests: starts an in-memory MongoDB, the API and the web app, then runs the flows in Chromium |
 | `pnpm start` | Starts the built API |
 
