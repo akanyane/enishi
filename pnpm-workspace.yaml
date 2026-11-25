@@ -5,3 +5,5 @@ packages:
 allowBuilds:
   bcrypt: true
   esbuild: true
+  # Its postinstall only pre-downloads the mongod binary; it downloads lazily on first use instead.
+  mongodb-memory-server: false

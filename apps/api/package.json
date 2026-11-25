@@ -6,8 +6,9 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "start": "node dist/server.js"
   },
   "dependencies": {
@@ -19,13 +20,17 @@
     "mongoose": "^9.10.2"
   },
   "devDependencies": {
+    "@enishi/shared": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.3",
+    "@types/supertest": "^7.2.1",
+    "mongodb-memory-server": "^11.4.0",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "@enishi/shared": "workspace:*"
+    "vitest": "~5.1.1"
   },
   "private": true
 }

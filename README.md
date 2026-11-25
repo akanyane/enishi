@@ -17,6 +17,7 @@ A [Turborepo](https://turborepo.dev) with pnpm workspaces:
 | `apps/api` | REST API — Express 5, MongoDB (Mongoose), JWT auth |
 | `apps/web` | Web app — React 19 + Vite, implementing the *Fichário* design |
 | `packages/shared` | TypeScript types shared by both apps (`Contact`, `User`, `ApiError`…) |
+| `apps/e2e` | Browser tests (Playwright) that run the real API and web app |
 
 ## Getting started
 
@@ -45,7 +46,19 @@ The Vite dev server proxies `/api` to the API, so the browser talks to a single 
 | `pnpm dev` | API (tsx watch) and web (Vite) in parallel |
 | `pnpm build` | Builds every app (`apps/*/dist`) |
 | `pnpm typecheck` | Type-checks every package |
+| `pnpm test` | API tests (against an in-memory MongoDB) and web unit tests |
+| `pnpm test:e2e` | Browser tests: starts an in-memory MongoDB, the API and the web app, then runs the flows in Chromium |
 | `pnpm start` | Starts the built API |
+
+### Tests
+
+Tests need no running database: `mongodb-memory-server` downloads a MongoDB binary on the first run and starts a throwaway instance. Before the first `pnpm test:e2e`, install the browser once:
+
+```bash
+pnpm --filter @enishi/e2e exec playwright install chromium
+```
+
+CI runs typecheck, build, `pnpm test` and `pnpm test:e2e` on every pull request, and `main` requires them to pass.
 
 ## API
 

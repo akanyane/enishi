@@ -12,6 +12,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
     "start": "pnpm --filter @enishi/api start"
   },
   "devDependencies": {
