@@ -1,6 +1,6 @@
 {
   "name": "enishi",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "private": true,
   "description": "Contact manager built with Express, MongoDB, React and TypeScript",
   "license": "MIT",
